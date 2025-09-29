@@ -7,13 +7,13 @@ const HashInfo = struct {
     signature: []const u8,
 };
 
-fn toU16LE(b1: u8, b2: u8) u16 {
+fn toU16(b1: u8, b2: u8) u16 {
     const val1: u16 = b1;
     const val2: u16 = b2;
     return val1 | (val2 << 8);
 }
 
-fn toU16LastByteLE(b: u8) u16 {
+fn toU16LastByte(b: u8) u16 {
     const val: u16 = b;
     return val;
 }
@@ -29,11 +29,11 @@ fn xor16_hash(file: std.fs.File) !u16 {
 
         var i: usize = 0;
         while (i + 1 < read_bytes) : (i += 2) {
-            const val = toU16LE(buffer[i], buffer[i + 1]);
+            const val = toU16(buffer[i], buffer[i + 1]);
             hash ^= val;
         }
         if ((read_bytes & 1) != 0) {
-            const val = toU16LastByteLE(buffer[read_bytes - 1]);
+            const val = toU16LastByte(buffer[read_bytes - 1]);
             hash ^= val;
         }
     }
@@ -113,7 +113,7 @@ fn readLine(
     }
 }
 
-fn readIntegrityFile(allocator: std.mem.Allocator, path: []const u8) !?std.StringHashMap(HashInfo) {
+fn readSignatureFile(allocator: std.mem.Allocator, path: []const u8) !?std.StringHashMap(HashInfo) {
     const cwd = std.fs.cwd();
 
     const file = cwd.openFile(path, .{}) catch |err| {
@@ -163,7 +163,7 @@ fn readIntegrityFile(allocator: std.mem.Allocator, path: []const u8) !?std.Strin
     return map;
 }
 
-fn writeIntegrityFile(
+fn writeSignatureFile(
     path: []const u8,
     map: *std.StringHashMap(HashInfo),
 ) !void {
@@ -225,7 +225,7 @@ pub fn main() !void {
 
     try walk_and_collect(dir, "", allocator, &new_map);
 
-    const old_map = try readIntegrityFile(allocator, SIGNATURE_FILE);
+    const old_map = try readSignatureFile(allocator, SIGNATURE_FILE);
 
     if (old_map) |old_val_const| {
         const old_val: *std.StringHashMap(HashInfo) = @constCast(&old_val_const);
@@ -236,7 +236,7 @@ pub fn main() !void {
         try printChanges(&empty_map, &new_map);
     }
 
-    try writeIntegrityFile(SIGNATURE_FILE, &new_map);
+    try writeSignatureFile(SIGNATURE_FILE, &new_map);
 
     var count: usize = 0;
     var it = new_map.iterator();
