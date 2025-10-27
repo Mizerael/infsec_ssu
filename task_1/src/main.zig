@@ -194,7 +194,20 @@ fn printChanges(
                 try stdout.print("Изменён файл: {s}\n", .{old_key});
             }
         } else {
-            try stdout.print("Удалён файл: {s}\n", .{old_key});
+            var fl: bool = false;
+            var a_it = new_map.iterator();
+            while (a_it.next()) |entry| {
+                if (fl) {} else {
+                    if (entry.value_ptr.hash == old_entry.value_ptr.hash) {
+                        try stdout.print("Переименован файл: {s}\n", .{old_key});
+                        try old_map.put(entry.key_ptr.*, HashInfo{ .hash = 1, .signature = undefined });
+                        fl = true;
+                    }
+                }
+            }
+            if (fl) {} else {
+                try stdout.print("Удалён файл: {s}\n", .{old_key});
+            }
         }
     }
 
@@ -244,5 +257,5 @@ pub fn main() !void {
         count += 1;
     }
     const stdout = std.io.getStdOut().writer();
-    try stdout.print("Файлов собрано: {d}\n", .{count});
+    try stdout.print("Файлов собрано: {d} \n", .{count});
 }
