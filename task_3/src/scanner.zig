@@ -49,11 +49,9 @@ pub fn scanDirectory(allocator: std.mem.Allocator, directory_path: []const u8) !
     std.debug.print("  Files with network functions: {}\n", .{result.files_with_network_funcs});
 }
 
-// Проверяем, является ли путь специальной системной директорией
 fn isSpecialSystemPath(path: []const u8) bool {
     const special_paths = [_][]const u8{
-        "/proc/",               "/sys/",                  "/dev/",       "/run/",
-        "\\System32\\config\\", "\\System32\\logfiles\\", "\\AppData\\", "\\Windows\\Temp\\",
+        "/proc/", "/sys/", "/dev/", "/run/",
     };
 
     for (special_paths) |special| {
@@ -80,7 +78,6 @@ fn analyzeAndPrintFile(
         return false;
     };
 
-    // Пропускаем слишком большие или слишком маленькие файлы
     if (stat.size == 0 or stat.size > 100 * 1024 * 1024) {
         return false;
     }

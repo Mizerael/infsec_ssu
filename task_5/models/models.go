@@ -10,11 +10,12 @@ import (
 )
 
 type ConnectionItem struct {
-	Proto  string
-	Local  string
-	Remote string
-	State  string
-	PID    string
+	Proto   string
+	Local   string
+	Remote  string
+	State   string
+	PID     string
+	Process string
 }
 
 func (c ConnectionItem) Title() string {
@@ -22,7 +23,7 @@ func (c ConnectionItem) Title() string {
 }
 
 func (c ConnectionItem) Description() string {
-	return fmt.Sprintf("State: %s | PID: %s", c.State, c.PID)
+	return fmt.Sprintf("State: %-13s| PID: %-8s | Process: %s", c.State, c.PID, c.Process)
 }
 
 func (c ConnectionItem) FilterValue() string {
@@ -82,8 +83,8 @@ func DefaultKeys() KeyMap {
 			key.WithHelp("i", "change interval"),
 		),
 		ToggleHelp: key.NewBinding(
-			key.WithKeys("h"),
-			key.WithHelp("h", "toggle help"),
+			key.WithKeys("?"),
+			key.WithHelp("?", "toggle help"),
 		),
 		Quit: key.NewBinding(
 			key.WithKeys("q", "ctrl+c"),

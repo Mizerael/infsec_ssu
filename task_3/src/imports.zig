@@ -204,7 +204,6 @@ pub const ImportAnalyzer = struct {
         while (true) {
             const desc = pe_file.readImportDescriptor(descriptor_offset) orelse break;
 
-            // Null descriptor marks the end
             if (desc.original_first_thunk == 0 and desc.name == 0 and desc.first_thunk == 0) break;
 
             const name_offset = pe_file.rvaToFileOffset(desc.name);
@@ -249,7 +248,7 @@ pub const ImportAnalyzer = struct {
                             const name_ptr_offset = pe_file.rvaToFileOffset(name_rva);
 
                             if (name_ptr_offset) |npo| {
-                                const name_ptr = npo + 2; // Пропускаем Hint
+                                const name_ptr = npo + 2;
 
                                 if (name_ptr >= pe_file.data.len) {
                                     thunk_index += 1;

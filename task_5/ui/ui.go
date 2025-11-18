@@ -11,8 +11,8 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/mizerael/infsec_ssu/task_5/connections"
 	"github.com/mizerael/infsec_ssu/task_5/models"
-	"github.com/mizerael/infsec_ssu/task_5/netstat"
 )
 
 type Model models.AppModel
@@ -26,7 +26,7 @@ func InitialModel() Model {
 		Foreground(lipgloss.Color("201"))
 
 	l := list.New([]list.Item{}, delegate, 80, 20)
-	l.Title = "Network Connections (netstat)"
+	l.Title = "StatTUI (glamourous netstat)"
 	l.Styles.Title = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("229")).
 		Background(lipgloss.Color("62")).
@@ -67,7 +67,7 @@ func (m Model) Init() tea.Cmd {
 
 func (m Model) getConnectionsCmd() tea.Cmd {
 	return func() tea.Msg {
-		connections, err := netstat.GetConnections(m.FilterState)
+		connections, err := connections.GetConnections(m.FilterState)
 		if err != nil {
 			return models.ConnectionErrorMsg(err.Error())
 		}
@@ -232,7 +232,7 @@ func (m Model) View() string {
 		Width(m.Width).
 		Align(lipgloss.Center)
 
-	s.WriteString(titleStyle.Render("Network Connections Monitor (netstat)"))
+	s.WriteString(titleStyle.Render("StatTUI (netstat)"))
 	s.WriteString("\n")
 
 	statusStyle := lipgloss.NewStyle().
@@ -284,7 +284,7 @@ func (m Model) View() string {
 			Foreground(lipgloss.Color("255")).
 			Bold(true).
 			Render("Commands: ") +
-			"f filter • r refresh • a auto-refresh • i interval • h help • q quit"
+			"f filter • r refresh • a auto-refresh • i interval • ? help • q quit"
 
 		helpContent := navLine + "\n" + cmdLine
 

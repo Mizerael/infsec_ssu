@@ -185,16 +185,14 @@ pub const PeFile = struct {
 
         if (nt_headers_offset + 4 + 20 > self.data.len) return false;
 
-        // Check PE signature
         const pe_signature = std.mem.readInt(u32, self.data[nt_headers_offset..][0..4], .little);
         if (pe_signature != IMAGE_NT_SIGNATURE) return false;
 
-        // Read File Header
         const file_header_offset = nt_headers_offset + 4;
         const file_header = try ImageFileHeader.read(self.data[file_header_offset..]);
 
         const optional_header_offset = file_header_offset + 20;
-        self.is_64bit = (file_header.machine == 0x8664); // AMD64
+        self.is_64bit = (file_header.machine == 0x8664 or file_header.machine == 0x0200);
 
         const sections_offset = optional_header_offset + file_header.size_of_optional_header;
         const sections_count = file_header.number_of_sections;
@@ -269,15 +267,5 @@ pub const PeFile = struct {
             if (offset + 4 > self.data.len) return null;
             return std.mem.readInt(u32, self.data[offset..][0..4], .little);
         }
-    }
-
-    pub fn readU32(self: *const PeFile, offset: usize) ?u32 {
-        if (offset + 4 > self.data.len) return null;
-        return std.mem.readInt(u32, self.data[offset..][0..4], .little);
-    }
-
-    pub fn readU16(self: *const PeFile, offset: usize) ?u16 {
-        if (offset + 2 > self.data.len) return null;
-        return std.mem.readInt(u16, self.data[offset..][0..2], .little);
     }
 };
